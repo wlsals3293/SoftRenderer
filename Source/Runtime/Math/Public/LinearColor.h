@@ -2,7 +2,7 @@
 
 #include "CoreDefinition.h"
 #include "Color32.h"
-#include "Math.h"
+#include "MathUtil.h"
 
 struct LinearColor
 {
