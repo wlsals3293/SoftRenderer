@@ -22,8 +22,13 @@ public:
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override { SwapBuffer(); }
 
+	virtual void SetVertexBuffer(VertexData* InVertexData) override;
+	virtual void SetIndexBuffer(const int* InIndexData) override;
+	virtual void DrawPrimitive(UINT InVertexSize, UINT InIndexSize) override;
+
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) override;
 
 private:
-
+	VertexData* VertexBuffer;
+	const int* IndexBuffer;
 };

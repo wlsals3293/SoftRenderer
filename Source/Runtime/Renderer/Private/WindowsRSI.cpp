@@ -1,6 +1,7 @@
 
 #include "Precompiled.h"
 #include "WindowsRSI.h"
+#include "TriangleRasterizer.h"
 
 void WindowsRSI::Init(const bool InbSRGBColorSpace)
 {
@@ -23,6 +24,46 @@ void WindowsRSI::Clear(const LinearColor & InClearColor)
 void WindowsRSI::BeginFrame()
 {
 
+}
+
+void WindowsRSI::SetVertexBuffer(VertexData * InVertexData)
+{
+	VertexBuffer = InVertexData;
+}
+
+void WindowsRSI::SetIndexBuffer(const int * InIndexData)
+{
+	IndexBuffer = InIndexData;
+}
+
+void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
+{
+	if (VertexBuffer == nullptr || IndexBuffer == nullptr)
+	{
+		return;
+	}
+
+	UINT triangleCount = (int)(InIndexSize / 3);
+
+	for (UINT i = 0; i < triangleCount; i++)
+	{
+		TriangleRasterizer tr(VertexBuffer[i * 3],
+			VertexBuffer[i * 3 + 1],
+			VertexBuffer[i * 3 + 2]);
+
+		for (int x = tr.TopLeft.X; x < tr.BottomRight.X; x++)
+		{
+			for (int y = tr.TopLeft.Y; y < tr.BottomRight.Y; y++)
+			{
+				ScreenPoint currentPixel(x, y);
+				Vector2 currentPos = currentPixel.ToVector2();
+				if (tr.IsInside(currentPos))
+				{
+					PutPixel(currentPixel, LinearColor(1.f, 0.f, 0.f));
+				}
+			}
+		}
+	}
 }
 
 void WindowsRSI::DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3)
