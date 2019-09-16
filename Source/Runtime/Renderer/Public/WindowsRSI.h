@@ -22,6 +22,8 @@ public:
 	virtual void BeginFrame() override;
 	virtual void EndFrame() override { SwapBuffer(); }
 
+	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) override;
+
 private:
 
 };
