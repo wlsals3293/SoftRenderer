@@ -26,6 +26,9 @@ public:
 	virtual void SetIndexBuffer(const int* InIndexData) override;
 	virtual void DrawPrimitive(UINT InVertexSize, UINT InIndexSize) override;
 
+	virtual void DrawVerticalLine(int InX, const LinearColor& InColor) override;
+	virtual void DrawHorizontalLine(int InY, const LinearColor& InColor) override;
+
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) override;
 
 private:

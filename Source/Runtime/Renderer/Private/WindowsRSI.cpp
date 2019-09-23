@@ -53,7 +53,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 
 		for (int x = tr.TopLeft.X; x < tr.BottomRight.X; x++)
 		{
-			for (int y = tr.TopLeft.Y; y < tr.BottomRight.Y; y++)
+			for (int y = tr.BottomRight.Y; y < tr.TopLeft.Y; y++)
 			{
 				ScreenPoint currentPixel(x, y);
 				Vector2 currentPos = currentPixel.ToVector2();
@@ -63,6 +63,31 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 				}
 			}
 		}
+	}
+}
+
+void WindowsRSI::DrawVerticalLine(int InX, const LinearColor & InColor)
+{
+	Color32* dest = ScreenBuffer;
+	unsigned long sizeX = ScreenSize.X;
+	int pixelX = InX + Math::FloorToInt(((float)ScreenSize.X - 1.f) * 0.5f);
+
+	for (int i = 0; i < ScreenSize.Y; i++)
+	{
+		*(dest + pixelX + (sizeX * i)) = InColor.ToColor32();
+	}
+}
+
+void WindowsRSI::DrawHorizontalLine(int InY, const LinearColor & InColor)
+{
+	Color32* dest = ScreenBuffer;
+	int pixelY = Math::FloorToInt(((float)ScreenSize.Y - 1.f) * 0.5f) - InY;
+
+	dest += pixelY * ScreenSize.X;
+
+	for (int i = 0; i < ScreenSize.X; i++)
+	{
+		*dest++ = InColor.ToColor32();
 	}
 }
 

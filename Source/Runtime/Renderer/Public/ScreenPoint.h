@@ -7,7 +7,7 @@ struct ScreenPoint
 {
 public:
 	ScreenPoint() : X(0), Y(0) { }
-	ScreenPoint(int InX, int InY) : X(InX), Y(InY) { }
+	ScreenPoint(int InX, int InY) : X(InX), Y(InY) {}
 
 	FORCEINLINE ScreenPoint GetHalfSize() const
 	{

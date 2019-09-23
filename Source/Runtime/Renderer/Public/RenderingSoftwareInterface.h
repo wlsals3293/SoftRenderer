@@ -23,5 +23,8 @@ public:
 	virtual void SetIndexBuffer(const int* InIndexData) = 0;
 	virtual void DrawPrimitive(UINT InVertexSize, UINT InIndexSize) = 0;
 
+	virtual void DrawVerticalLine(int InX, const LinearColor& InColor) = 0;
+	virtual void DrawHorizontalLine(int InY, const LinearColor& InColor) = 0;
+
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) = 0;
 };

@@ -38,14 +38,14 @@ void SoftRenderer::Update()
 		*/
 		RSI->SetColor(LinearColor(1.f, 0.f, 0.f, 1.f));
 
-		VertexData vertices[6];
-		vertices[0].Position = Vector2(200.f, 200.f);
-		vertices[1].Position = Vector2(130.f, 70.f);
-		vertices[2].Position = Vector2(260.f, 100.f);
-
-		vertices[3].Position = Vector2(-100.f, -50.f);
-		vertices[4].Position = Vector2(-230.f, -200.f);
-		vertices[5].Position = Vector2(-50.f, -250.f);
+		/*VertexData vertices[6];
+		vertices[0].Position = Vector2(130.f, 70.f);
+		vertices[1].Position = Vector2(260.f, 100.f);
+		vertices[2].Position = Vector2(200.f, 200.f);
+		
+		vertices[3].Position = Vector2(-230.f, -200.f);
+		vertices[4].Position = Vector2(-50.f, -250.f);
+		vertices[5].Position = Vector2(-100.f, -50.f);
 
 		int indices[6];
 		indices[0] = 0;
@@ -58,7 +58,29 @@ void SoftRenderer::Update()
 		// Draw Call
 		RSI->SetVertexBuffer(vertices);
 		RSI->SetIndexBuffer(indices);
-		RSI->DrawPrimitive(6, 6);
+		RSI->DrawPrimitive(6, 6);*/
+
+		RSI->DrawVerticalLine(0, LinearColor(0.f, 1.f, 0.f, 1.f));
+		RSI->DrawHorizontalLine(0, LinearColor(1.f, 0.f, 0.f, 1.f));
+
+		ScreenPoint screenSize = DisplaySetting::Inst().GetSize();
+		ScreenPoint halfSize = screenSize.GetHalfSize();
+		LinearColor gridColor(0.6f, 0.6f, 0.6f, 1.f);
+		int padding = 10;
+		int verticalCount = Math::TruncToInt(halfSize.X / padding);
+		int horizontalCount = Math::TruncToInt(halfSize.Y / padding);
+
+		for (int i = 1; i < verticalCount; i++)
+		{
+			RSI->DrawVerticalLine(i * padding, gridColor);
+			RSI->DrawVerticalLine(i * -padding, gridColor);
+		}
+
+		for (int i = 1; i < horizontalCount; i++)
+		{
+			RSI->DrawHorizontalLine(i * padding, gridColor);
+			RSI->DrawHorizontalLine(i * -padding, gridColor);
+		}
 
 		RSI->EndFrame();
 	}
