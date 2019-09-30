@@ -18,8 +18,8 @@ public:
 	void FillBuffer();
 	void SetColor(const LinearColor& InColor);
 	LinearColor GetPixel(const ScreenPoint& InPos);
-	void PutPixel(const ScreenPoint& InPos);
-	void PutPixel(const ScreenPoint& InPos, const LinearColor& InColor);
+	void SetPixel(const ScreenPoint& InPos);
+	void SetPixel(const ScreenPoint& InPos, const LinearColor& InColor);
 
 	void CreateDepthBuffer();
 	void ClearDepthBuffer();
@@ -35,7 +35,7 @@ protected:
 	bool bGDIInitialized = false;
 
 	FORCEINLINE bool IsInScreen(const ScreenPoint& InPos) const;
-	void PutPixel(const ScreenPoint& InPos, const Color32& InColor);
+	void SetPixel(const ScreenPoint& InPos, const Color32& InColor);
 
 	HWND Wnd;
 	HDC	ScreenDC, MemoryDC;

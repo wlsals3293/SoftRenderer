@@ -25,6 +25,13 @@ public:
 	static const float OneOver255;
 	static const LinearColor Error;
 
+	static const LinearColor Black;
+	static const LinearColor White;
+	static const LinearColor Red;
+	static const LinearColor Green;
+	static const LinearColor Blue;
+
+
 public:
 	float R = 0.f;
 	float G = 0.f;

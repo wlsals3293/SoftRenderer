@@ -113,23 +113,12 @@ LinearColor WindowsGDI::GetPixel(const ScreenPoint& InPos)
 	return LinearColor(bufferColor);
 }
 
-void WindowsGDI::PutPixel(const ScreenPoint& InPos)
+void WindowsGDI::SetPixel(const ScreenPoint& InPos)
 {
-	PutPixel(InPos, CurrentColor);
+	SetPixel(InPos, CurrentColor);
 }
 
-FORCEINLINE bool WindowsGDI::IsInScreen(const ScreenPoint& InPos) const
-{
-	ScreenPoint halfSize = ScreenSize.GetHalfSize();
-	if (!(Math::Abs(InPos.X) < halfSize.X) || !(Math::Abs(InPos.Y) < halfSize.Y))
-	{
-		return false;
-	}
-
-	return true;
-}
-
-void WindowsGDI::PutPixel(const ScreenPoint& InPos, const Color32& InColor)
+void WindowsGDI::SetPixel(const ScreenPoint& InPos, const Color32& InColor)
 {
 	if (!IsInScreen(InPos))
 	{
@@ -143,12 +132,26 @@ void WindowsGDI::PutPixel(const ScreenPoint& InPos, const Color32& InColor)
 	return;
 }
 
+void WindowsGDI::SetPixel(const ScreenPoint& InPos, const LinearColor& InColor)
+{
+	SetPixel(InPos, InColor.ToColor32(bSRGBColorSpace));
+}
+
+FORCEINLINE bool WindowsGDI::IsInScreen(const ScreenPoint& InPos) const
+{
+	ScreenPoint halfSize = ScreenSize.GetHalfSize();
+	if (!(Math::Abs(InPos.X) < halfSize.X) || !(Math::Abs(InPos.Y) < halfSize.Y))
+	{
+		return false;
+	}
+
+	return true;
+}
 
 Color32* WindowsGDI::GetScreenBuffer() const
 {
 	return ScreenBuffer;
 }
-
 
 void WindowsGDI::SwapBuffer()
 {
@@ -158,12 +161,6 @@ void WindowsGDI::SwapBuffer()
 	}
 
 	BitBlt(ScreenDC, 0, 0, ScreenSize.X, ScreenSize.Y, MemoryDC, 0, 0, SRCCOPY);
-}
-
-
-void WindowsGDI::PutPixel(const ScreenPoint& InPos, const LinearColor& InColor)
-{
-	PutPixel(InPos, InColor.ToColor32(bSRGBColorSpace));
 }
 
 void WindowsGDI::CreateDepthBuffer()

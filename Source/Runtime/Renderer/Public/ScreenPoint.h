@@ -1,13 +1,14 @@
 #pragma once
 
 #include "CoreDefinition.h"
-#include "Vector2.h"
+#include "MathHeaders.h"
 
 struct ScreenPoint
 {
 public:
 	ScreenPoint() : X(0), Y(0) { }
 	ScreenPoint(int InX, int InY) : X(InX), Y(InY) {}
+	ScreenPoint(const Vector2& InVector) : X(Math::TruncToInt(InVector.X)), Y(Math::TruncToInt(InVector.Y)) {}
 
 	FORCEINLINE ScreenPoint GetHalfSize() const
 	{

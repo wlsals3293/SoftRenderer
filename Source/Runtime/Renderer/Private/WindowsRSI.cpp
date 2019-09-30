@@ -59,8 +59,61 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 				Vector2 currentPos = currentPixel.ToVector2();
 				if (tr.IsInside(currentPos))
 				{
-					PutPixel(currentPixel, LinearColor(1.f, 0.f, 0.f));
+					SetPixel(currentPixel, LinearColor(1.f, 0.f, 0.f));
 				}
+			}
+		}
+	}
+}
+
+void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, const LinearColor & InColor)
+{
+	ScreenPoint currentPos = InStartPos;
+
+	int w = InEndPos.X - InStartPos.X;
+	int h = InEndPos.Y - InStartPos.Y;
+
+
+
+	
+	if (Math::Abs(w) > Math::Abs(h)) {
+		int f = 2 * h - w;
+		int dF1 = 2 * h;
+		int dF2 = 2 * (h - w);
+
+		for (; currentPos.X <= InEndPos.X; currentPos.X++)
+		{
+			SetPixel(currentPos, InColor);
+
+			if (f < 0)
+			{
+				f += dF1;
+			}
+			else
+			{
+				currentPos.Y++;
+				f += dF2;
+			}
+		}
+	}
+	else
+	{
+		int f = h - 2 * w;
+		int dF1 = -2 * w;
+		int dF2 = 2 * (h - w);
+
+		for (; currentPos.Y <= InEndPos.Y; currentPos.Y++)
+		{
+			SetPixel(currentPos, InColor);
+
+			if (f > 0)
+			{
+				f += dF1;
+			}
+			else
+			{
+				currentPos.X++;
+				f += dF2;
 			}
 		}
 	}
@@ -128,7 +181,7 @@ void WindowsRSI::DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector
 			float t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
 			if (s >= 0 && t >= 0 && ((s + t) <= 1))
 			{
-				PutPixel(point);
+				SetPixel(point);
 			}
 		}
 	}
