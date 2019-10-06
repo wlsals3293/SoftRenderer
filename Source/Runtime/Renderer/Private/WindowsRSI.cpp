@@ -13,7 +13,7 @@ void WindowsRSI::Shutdown()
 	ReleaseGDI();
 }
 
-void WindowsRSI::Clear(const LinearColor & InClearColor)
+void WindowsRSI::Clear(const LinearColor& InClearColor)
 {
 	SetColor(InClearColor);
 	FillBuffer();
@@ -26,12 +26,12 @@ void WindowsRSI::BeginFrame()
 
 }
 
-void WindowsRSI::SetVertexBuffer(VertexData * InVertexData)
+void WindowsRSI::SetVertexBuffer(VertexData* InVertexData)
 {
 	VertexBuffer = InVertexData;
 }
 
-void WindowsRSI::SetIndexBuffer(const int * InIndexData)
+void WindowsRSI::SetIndexBuffer(const int* InIndexData)
 {
 	IndexBuffer = InIndexData;
 }
@@ -66,22 +66,34 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 	}
 }
 
-void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, const LinearColor & InColor)
+void WindowsRSI::DrawLine(const Vector2& InStartPos, const Vector2& InEndPos, const LinearColor& InColor)
 {
-	ScreenPoint currentPos = InStartPos;
+	ScreenPoint currentPos, endPos;
 
-	int w = InEndPos.X - InStartPos.X;
-	int h = InEndPos.Y - InStartPos.Y;
+	int w = Math::Abs(InEndPos.X - InStartPos.X);
+	int h = Math::Abs(InEndPos.Y - InStartPos.Y);
 
+	if (w > h)
+	{
+		currentPos = (InStartPos.X < InEndPos.X) ? InStartPos : InEndPos;
+		endPos = (InStartPos.X < InEndPos.X) ? InEndPos : InStartPos;
+	}
+	else
+	{
+		currentPos = (InStartPos.Y < InEndPos.Y) ? InStartPos : InEndPos;
+		endPos = (InStartPos.Y < InEndPos.Y) ? InEndPos : InStartPos;
+	}
 
+	int deltaX = (currentPos.X < endPos.X) ? 1 : -1;
+	int deltaY = (currentPos.Y < endPos.Y) ? 1 : -1;
 
 	
-	if (Math::Abs(w) > Math::Abs(h)) {
+	if (w > h) {
 		int f = 2 * h - w;
 		int dF1 = 2 * h;
 		int dF2 = 2 * (h - w);
 
-		for (; currentPos.X <= InEndPos.X; currentPos.X++)
+		for (; currentPos.X <= endPos.X; currentPos.X++)
 		{
 			SetPixel(currentPos, InColor);
 
@@ -91,7 +103,7 @@ void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, 
 			}
 			else
 			{
-				currentPos.Y++;
+				currentPos.Y += deltaY;
 				f += dF2;
 			}
 		}
@@ -102,7 +114,7 @@ void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, 
 		int dF1 = -2 * w;
 		int dF2 = 2 * (h - w);
 
-		for (; currentPos.Y <= InEndPos.Y; currentPos.Y++)
+		for (; currentPos.Y <= endPos.Y; currentPos.Y++)
 		{
 			SetPixel(currentPos, InColor);
 
@@ -112,18 +124,18 @@ void WindowsRSI::DrawLine(const Vector2 & InStartPos, const Vector2 & InEndPos, 
 			}
 			else
 			{
-				currentPos.X++;
+				currentPos.X += deltaX;
 				f += dF2;
 			}
 		}
 	}
 }
 
-void WindowsRSI::DrawVerticalLine(int InX, const LinearColor & InColor)
+void WindowsRSI::DrawVerticalLine(int InX, const LinearColor& InColor)
 {
 	Color32* dest = ScreenBuffer;
 	unsigned long sizeX = ScreenSize.X;
-	int pixelX = InX + Math::FloorToInt(((float)ScreenSize.X - 1.f) * 0.5f);
+	int pixelX = InX + Math::TruncToInt((float)ScreenSize.X * 0.5f);
 
 	for (int i = 0; i < ScreenSize.Y; i++)
 	{
@@ -131,10 +143,10 @@ void WindowsRSI::DrawVerticalLine(int InX, const LinearColor & InColor)
 	}
 }
 
-void WindowsRSI::DrawHorizontalLine(int InY, const LinearColor & InColor)
+void WindowsRSI::DrawHorizontalLine(int InY, const LinearColor& InColor)
 {
 	Color32* dest = ScreenBuffer;
-	int pixelY = Math::FloorToInt(((float)ScreenSize.Y - 1.f) * 0.5f) - InY;
+	int pixelY = Math::TruncToInt((float)ScreenSize.Y * 0.5f) - InY;
 
 	dest += pixelY * ScreenSize.X;
 

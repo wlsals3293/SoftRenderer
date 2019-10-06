@@ -28,14 +28,6 @@ void SoftRenderer::Update()
 	{
 		RSI->Clear(LinearColor(0.125f, 0.5f, 1.f, 1.f));
 
-		/*
-		Vector2 P1(70.f, 150.f);
-		Vector2 P2(-150.f, 0.f);
-		Vector2 P3(150.f, 0.f);
-
-		RSI->SetColor(LinearColor(1.f, 0.f, 0.f, 1.f));
-		RSI->DrawTriangle(P1, P2, P3);
-		*/
 		/*RSI->SetColor(LinearColor(1.f, 0.f, 0.f, 1.f));
 
 		VertexData vertices[6];
@@ -64,7 +56,7 @@ void SoftRenderer::Update()
 		ScreenPoint screenSize = DisplaySetting::Inst().GetSize();
 		ScreenPoint halfSize = screenSize.GetHalfSize();
 		LinearColor gridColor(0.6f, 0.6f, 0.6f, 1.f);
-		int padding = 100;
+		int padding = 10;
 		int verticalCount = Math::TruncToInt(halfSize.X / padding);
 		int horizontalCount = Math::TruncToInt(halfSize.Y / padding);
 
@@ -84,7 +76,21 @@ void SoftRenderer::Update()
 		RSI->DrawHorizontalLine(0, LinearColor::Red);
 
 
+		// 1사분면
 		RSI->DrawLine(Vector2(30.f, 30.f), Vector2(100.f, 200.f), LinearColor::White);
+		RSI->DrawLine(Vector2(30.f, 30.f), Vector2(200.f, 100.f), LinearColor::White);
+
+		// 2사분면
+		RSI->DrawLine(Vector2(-30.f, 30.f), Vector2(-100.f, 200.f), LinearColor::White);
+		RSI->DrawLine(Vector2(-30.f, 30.f), Vector2(-200.f, 100.f), LinearColor::White);
+
+		// 3사분면
+		RSI->DrawLine(Vector2(-30.f, -30.f), Vector2(-100.f, -200.f), LinearColor::White);
+		RSI->DrawLine(Vector2(-30.f, -30.f), Vector2(-200.f, -100.f), LinearColor::White);
+
+		// 4사분면
+		RSI->DrawLine(Vector2(30.f, -30.f), Vector2(100.f, -200.f), LinearColor::White);
+		RSI->DrawLine(Vector2(30.f, -30.f), Vector2(200.f, -100.f), LinearColor::White);
 
 
 		RSI->EndFrame();
