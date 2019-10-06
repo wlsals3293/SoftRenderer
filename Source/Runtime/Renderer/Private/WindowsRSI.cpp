@@ -72,26 +72,22 @@ void WindowsRSI::DrawLine(const Vector2& InStartPos, const Vector2& InEndPos, co
 
 	int w = Math::Abs(InEndPos.X - InStartPos.X);
 	int h = Math::Abs(InEndPos.Y - InStartPos.Y);
+	int delta;
 
+	// 가로 길이가 세로 길이보다 클 때
 	if (w > h)
 	{
-		currentPos = (InStartPos.X < InEndPos.X) ? InStartPos : InEndPos;
-		endPos = (InStartPos.X < InEndPos.X) ? InEndPos : InStartPos;
-	}
-	else
-	{
-		currentPos = (InStartPos.Y < InEndPos.Y) ? InStartPos : InEndPos;
-		endPos = (InStartPos.Y < InEndPos.Y) ? InEndPos : InStartPos;
-	}
-
-	int deltaX = (currentPos.X < endPos.X) ? 1 : -1;
-	int deltaY = (currentPos.Y < endPos.Y) ? 1 : -1;
-
-	
-	if (w > h) {
+		// 판별식
 		int f = 2 * h - w;
 		int dF1 = 2 * h;
 		int dF2 = 2 * (h - w);
+
+		// x 값이 작은 지점부터 시작
+		currentPos = (InStartPos.X < InEndPos.X) ? InStartPos : InEndPos;
+		endPos = (InStartPos.X < InEndPos.X) ? InEndPos : InStartPos;
+
+		// 목표 지점보다 y가 작으면 + 아니면 -
+		delta = (currentPos.Y < endPos.Y) ? 1 : -1;
 
 		for (; currentPos.X <= endPos.X; currentPos.X++)
 		{
@@ -103,16 +99,25 @@ void WindowsRSI::DrawLine(const Vector2& InStartPos, const Vector2& InEndPos, co
 			}
 			else
 			{
-				currentPos.Y += deltaY;
+				currentPos.Y += delta;
 				f += dF2;
 			}
 		}
 	}
+	// 가로 길이가 세로 길이와 같거나 작을 때
 	else
 	{
+		// 판별식
 		int f = h - 2 * w;
 		int dF1 = -2 * w;
 		int dF2 = 2 * (h - w);
+
+		// y 값이 작은 지점부터 시작
+		currentPos = (InStartPos.Y < InEndPos.Y) ? InStartPos : InEndPos;
+		endPos = (InStartPos.Y < InEndPos.Y) ? InEndPos : InStartPos;
+
+		// 목표 지점보다 x가 작으면 + 아니면 -
+		delta = (currentPos.X < endPos.X) ? 1 : -1;
 
 		for (; currentPos.Y <= endPos.Y; currentPos.Y++)
 		{
@@ -124,7 +129,7 @@ void WindowsRSI::DrawLine(const Vector2& InStartPos, const Vector2& InEndPos, co
 			}
 			else
 			{
-				currentPos.X += deltaX;
+				currentPos.X += delta;
 				f += dF2;
 			}
 		}
