@@ -47,6 +47,90 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 
 	for (UINT i = 0; i < triangleCount; i++)
 	{
+		VertexData v1 = VertexBuffer[IndexBuffer[i * 3]];
+		VertexData v2 = VertexBuffer[IndexBuffer[i * 3 + 1]];
+		VertexData v3 = VertexBuffer[IndexBuffer[i * 3 + 2]];
+		VertexData temp;
+		bool isForward = true;
+		bool isDouble = false;
+
+		// 1. 삼각형 정점 소팅
+		if (v1.Position.Y < v2.Position.Y)
+		{
+			temp = v1;
+			v1 = v2;
+			v2 = temp;
+		}
+		if (v1.Position.Y < v3.Position.Y)
+		{
+			temp = v1;
+			v1 = v3;
+			v3 = temp;
+		}
+		if (v2.Position.Y < v3.Position.Y)
+		{
+			temp = v2;
+			v2 = v3;
+			v3 = temp;
+		}
+
+		if (Math::Abs(v1.Position.Y - v2.Position.Y) > 0.00001f)
+		{
+			if (v2.Position.X > v3.Position.X)
+			{
+				temp = v2;
+				v2 = v3;
+				v3 = temp;
+			}
+			if (Math::Abs(v2.Position.Y - v3.Position.Y) > 0.00001f)
+			{
+				isDouble = true;
+			}
+		}
+		else
+		{
+			if (v1.Position.X > v2.Position.X)
+			{
+				temp = v1;
+				v1 = v2;
+				v2 = temp;
+			}
+			isForward = false;
+		}
+
+		// 2. 삼각형 패턴 파악 (Top-Flat, Bottom-Flat, Normal)
+
+
+
+		// 3. Top-Flat, Bottom-Flat은 해당 로직으로,
+		// Normal은 두 개로 분리해서 상하를 나눠서 그리기
+
+		float dx1 = v2.Position.X - v1.Position.X;
+		float dx2 = v3.Position.X - v1.Position.X;
+		float dy = v2.Position.Y - v1.Position.Y;
+
+		if (isForward)
+		{
+			float a1 = dx1 / dy;
+			float a2 = dx2 / dy;
+
+			float startX = v1.Position.X;
+			float startY = v1.Position.Y;
+			float currentY = floorf(v1.Position.Y) - 0.5f;
+			float destY = v2.Position.Y;
+
+			while (currentY >= destY)
+			{
+				float deltaY = startY - currentY;
+
+			}
+		}
+		else
+		{
+		}
+
+
+		/*
 		TriangleRasterizer tr(VertexBuffer[i * 3],
 			VertexBuffer[i * 3 + 1],
 			VertexBuffer[i * 3 + 2]);
@@ -62,7 +146,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 					SetPixel(currentPixel, LinearColor(1.f, 0.f, 0.f));
 				}
 			}
-		}
+		}*/
 	}
 }
 
