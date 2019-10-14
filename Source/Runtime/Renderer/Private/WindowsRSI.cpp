@@ -1,4 +1,3 @@
-
 #include "Precompiled.h"
 #include "WindowsRSI.h"
 #include "TriangleRasterizer.h"
@@ -45,14 +44,12 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 
 	UINT triangleCount = (int)(InIndexSize / 3);
 
-	for (UINT i = 0; i < triangleCount; i++)
+	for (UINT ti = 0; ti < triangleCount; ti++)
 	{
-		VertexData v1 = VertexBuffer[IndexBuffer[i * 3]];
+		/*VertexData v1 = VertexBuffer[IndexBuffer[i * 3]];
 		VertexData v2 = VertexBuffer[IndexBuffer[i * 3 + 1]];
 		VertexData v3 = VertexBuffer[IndexBuffer[i * 3 + 2]];
 		VertexData temp;
-		bool isForward = true;
-		bool isDouble = false;
 
 		// 1. 삼각형 정점 소팅
 		if (v1.Position.Y < v2.Position.Y)
@@ -84,7 +81,6 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 			}
 			if (Math::Abs(v2.Position.Y - v3.Position.Y) > 0.00001f)
 			{
-				isDouble = true;
 			}
 		}
 		else
@@ -95,39 +91,134 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 				v1 = v2;
 				v2 = temp;
 			}
-			isForward = false;
-		}
+		}*/
 
-		// 2. 삼각형 패턴 파악 (Top-Flat, Bottom-Flat, Normal)
+		VertexData tv[3] = {
+			VertexBuffer[IndexBuffer[ti * 3]],
+			VertexBuffer[IndexBuffer[ti * 3 + 1]],
+			VertexBuffer[IndexBuffer[ti * 3 + 2]]
+		};
+		VertexData temp;
 
+		// TO-DO. 퇴화 삼각형인지 식별.
 
-
-		// 3. Top-Flat, Bottom-Flat은 해당 로직으로,
-		// Normal은 두 개로 분리해서 상하를 나눠서 그리기
-
-		float dx1 = v2.Position.X - v1.Position.X;
-		float dx2 = v3.Position.X - v1.Position.X;
-		float dy = v2.Position.Y - v1.Position.Y;
-
-		if (isForward)
+		// 1. 삼각형 정점 소팅
+		// 1-1. 0번과 1번의 Y값 비교
+		if (tv[0].Position.Y == tv[1].Position.Y)
 		{
-			float a1 = dx1 / dy;
-			float a2 = dx2 / dy;
-
-			float startX = v1.Position.X;
-			float startY = v1.Position.Y;
-			float currentY = floorf(v1.Position.Y) - 0.5f;
-			float destY = v2.Position.Y;
-
-			while (currentY >= destY)
+			// X 값을 비교.
+			if (tv[0].Position.X > tv[1].Position.X)
 			{
-				float deltaY = startY - currentY;
-
+				// 0번과 1번을 Swap
+				temp = tv[0];
+				tv[0] = tv[1];
+				tv[1] = temp;
 			}
 		}
 		else
 		{
+			if (tv[0].Position.Y < tv[1].Position.Y)
+			{
+				// 0번과 1번을 Swap
+				temp = tv[0];
+				tv[0] = tv[1];
+				tv[1] = temp;
+			}
 		}
+
+		if (tv[1].Position.Y == tv[2].Position.Y)
+		{
+			// X 값을 비교.
+			if (tv[1].Position.X > tv[2].Position.X)
+			{
+				// 1번과 2번을 Swap
+				temp = tv[1];
+				tv[1] = tv[2];
+				tv[2] = temp;
+			}
+		}
+		else
+		{
+			if (tv[1].Position.Y < tv[2].Position.Y)
+			{
+				// 1번과 2번을 Swap
+				temp = tv[1];
+				tv[1] = tv[2];
+				tv[2] = temp;
+			}
+		}
+
+
+		if (tv[0].Position.Y == tv[1].Position.Y)
+		{
+			// X 값을 비교.
+			if (tv[0].Position.X > tv[1].Position.X)
+			{
+				// 0번과 1번을 Swap
+				temp = tv[0];
+				tv[0] = tv[1];
+				tv[1] = temp;
+			}
+		}
+		else
+		{
+			if (tv[0].Position.Y < tv[1].Position.Y)
+			{
+				// 0번과 1번을 Swap
+				temp = tv[0];
+				tv[0] = tv[1];
+				tv[1] = temp;
+			}
+		}
+
+
+
+		// 2. 삼각형 패턴 파악 (Top-Flat, Bottom-Flat, Normal)
+
+		if (tv[0].Position.Y == tv[1].Position.Y)
+		{
+			DrawTopFlatTriangle(tv);
+		}
+		else if (tv[1].Position.Y == tv[2].Position.Y)
+		{
+			DrawBottomFlatTriangle(tv);
+		}
+		else
+		{
+			// 삼각형을 두 개로 쪼갠다.
+			VertexData newV = tv[1];
+			float height = tv[0].Position.Y - tv[2].Position.Y;
+			float width = tv[2].Position.X - tv[0].Position.X;
+
+			if (height == 0.0f)
+			{
+				return;
+			}
+
+			float gradient = width / height;
+			newV.Position.X = gradient * (tv[0].Position.Y - tv[1].Position.Y) + tv[0].Position.X;
+
+			if (newV.Position.X > tv[1].Position.X)
+			{
+				VertexData upperTriangle[3] = { tv[0], tv[1], newV };
+				VertexData bottomTriangle[3] = { tv[1], newV, tv[2] };
+				DrawTopFlatTriangle(bottomTriangle);
+				DrawBottomFlatTriangle(upperTriangle);
+			}
+			else
+			{
+				VertexData upperTriangle[3] = { tv[0], newV, tv[1] };
+				VertexData bottomTriangle[3] = { newV, tv[1], tv[2] };
+				DrawTopFlatTriangle(bottomTriangle);
+				DrawBottomFlatTriangle(upperTriangle);
+			}
+		}
+
+		// 3. Top-Flat, Bottom-Flat은 해당 로직으로,
+		// Normal은 두 개로 분리해서 상하를 나눠서 그리기
+
+		
+
 
 
 		/*
@@ -285,5 +376,99 @@ void WindowsRSI::DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector
 				SetPixel(point);
 			}
 		}
+	}
+}
+
+void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
+{
+	float dx1 = tvs[0].Position.X - tvs[2].Position.X;
+	float dx2 = tvs[1].Position.X - tvs[2].Position.X;
+	float dy = tvs[2].Position.Y - tvs[1].Position.Y;
+
+
+	if (dy >= 0)
+	{
+		return;
+	}
+
+	float a1 = dx1 / dy;
+	float a2 = dx2 / dy;
+
+
+	SetPixel(ScreenPoint(tvs[2].Position), LinearColor(1.f, 0.f, 0.f));
+	float startX = tvs[2].Position.X;
+	float startY = tvs[2].Position.Y;
+	float currentY = floorf(tvs[2].Position.Y) - 0.5f;
+	float destY = tvs[1].Position.Y;
+
+	while (currentY <= destY)
+	{
+		float deltaY = startY - currentY;
+		float leftX = a1 * deltaY + startX;
+		float rightX = a2 * deltaY + startX;
+		int pixelX1 = Math::FloorToInt(leftX);
+		int pixelX2 = Math::FloorToInt(rightX);
+		int pixelY = Math::FloorToInt(currentY);
+		for (int p = pixelX1; p <= pixelX2; ++p)
+		{
+			SetPixel(ScreenPoint(p, pixelY), LinearColor(1.f, 0.f, 0.f));
+		}
+		currentY += 1.0f;
+	}
+
+	if (DrawLastLine)
+	{
+		// 마지막 라인을 그린다.
+		int pixelX1 = Math::FloorToInt(tvs[1].Position.X);
+		int pixelX2 = Math::FloorToInt(tvs[2].Position.X);
+		int pixelY = Math::FloorToInt(destY);
+		for (int p = pixelX1; p <= pixelX2; ++p)
+		{
+			SetPixel(ScreenPoint(p, pixelY), LinearColor(1.f, 0.f, 0.f));
+		}
+	}
+}
+
+void WindowsRSI::DrawBottomFlatTriangle(VertexData * tvs)
+{
+	float dx1 = tvs[1].Position.X - tvs[0].Position.X;
+	float dx2 = tvs[2].Position.X - tvs[0].Position.X;
+	float dy = tvs[0].Position.Y - tvs[1].Position.Y;
+
+	if (dy <= 0)
+	{
+		return;
+	}
+
+	float gradient1 = dx1 / dy;
+	float gradient2 = dx2 / dy;
+
+	SetPixel(ScreenPoint(tvs[0].Position), LinearColor(0.f, 1.f, 0.f));
+	float startY = tvs[0].Position.Y;
+	float startX = tvs[0].Position.X;
+	float currentY = floorf(tvs[0].Position.Y) - 0.5f;
+	float destY = tvs[1].Position.Y;
+	while (currentY >= destY)
+	{
+		float deltaY = startY - currentY;
+		float leftX = gradient1 * deltaY + startX;
+		float rightX = gradient2 * deltaY + startX;
+		int startX = Math::FloorToInt(leftX);
+		int endX = Math::FloorToInt(rightX);
+		int pixelY = Math::FloorToInt(currentY);
+		for (int p = startX; p <= endX; ++p)
+		{
+			SetPixel(ScreenPoint(p, pixelY), LinearColor(0.f, 1.f, 0.f));
+		}
+		currentY -= 1.0f;
+	}
+
+	// 마지막 라인을 그린다.
+	int pixelX1 = Math::FloorToInt(tvs[0].Position.X);
+	int pixelX2 = Math::FloorToInt(tvs[1].Position.X);
+	int pixelY = Math::FloorToInt(destY);
+	for (int p = pixelX1; p <= pixelX2; ++p)
+	{
+		SetPixel(ScreenPoint(p, pixelY), LinearColor(0.f, 1.f, 0.f));
 	}
 }

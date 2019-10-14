@@ -28,4 +28,6 @@ public:
 	virtual void DrawHorizontalLine(int InY, const LinearColor& InColor) = 0;
 
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) = 0;
+	virtual void DrawTopFlatTriangle(VertexData* tvs, bool DrawLastLine) = 0;
+	virtual void DrawBottomFlatTriangle(VertexData* tvs) = 0;
 };

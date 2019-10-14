@@ -31,6 +31,8 @@ public:
 	virtual void DrawHorizontalLine(int InY, const LinearColor& InColor) override;
 
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) override;
+	virtual void DrawTopFlatTriangle(VertexData* tvs, bool DrawLastLine = false) override;
+	virtual void DrawBottomFlatTriangle(VertexData* tvs) override;
 
 private:
 	VertexData* VertexBuffer;
