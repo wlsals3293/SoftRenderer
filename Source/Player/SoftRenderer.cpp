@@ -111,9 +111,11 @@ void SoftRenderer::Update()
 		*/
 
 
-		Matrix2x2 resultMat, rotateMat, scaleMat;
+		Matrix3x3 resultMat, translationMat, rotateMat, scaleMat;
 
-		static float angleSpeedPerSec = 180.f;
+		translationMat.SetTranslation(Vector3(100.f, 0.f));
+
+		/*static float angleSpeedPerSec = 180.f;
 		float currentAngle = ElapsedTime * angleSpeedPerSec;
 		rotateMat.SetRotation(Math::Deg2Rad(currentAngle));
 
@@ -124,20 +126,20 @@ void SoftRenderer::Update()
 
 		Vector2 calVector = (maxScale - minScale) * ((sin+1.f) / 2.f);
 
-		scaleMat.SetScale(minScale + calVector);
+		scaleMat.SetScale(minScale + calVector);*/
 
-		resultMat = rotateMat * scaleMat;
+		resultMat = translationMat;
 
 		// Define Mesh Data
 		VertexData v[9];
-		v[0].Position = Vector2(-150.0f, -100.0f);
+		v[0].Position = Vector2(-60.0f, 0.0f);
 		v[0].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[1].Position = Vector2(-200.0f, 100.0f);
+		v[1].Position = Vector2(20.0f, 0.0f);
 		v[1].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[2].Position = Vector2(-100.0f, 100.0f);
+		v[2].Position = Vector2(0.0f, 90.0f);
 		v[2].Color = LinearColor(0.0f, 0.0f, 1.0f);
 
-		v[3].Position = Vector2(150.0f, 100.0f);
+		/*v[3].Position = Vector2(150.0f, 100.0f);
 		v[3].Color = LinearColor(1.0f, 0.0f, 0.0f);
 		v[4].Position = Vector2(100.0f, -100.0f);
 		v[4].Color = LinearColor(0.0f, 1.0f, 0.0f);
@@ -149,7 +151,7 @@ void SoftRenderer::Update()
 		v[7].Position = Vector2(-50.0f, 0.0f);
 		v[7].Color = LinearColor(0.0f, 1.0f, 0.0f);
 		v[8].Position = Vector2(0.0f, -100.0f);
-		v[8].Color = LinearColor(0.0f, 0.0f, 1.0f);
+		v[8].Color = LinearColor(0.0f, 0.0f, 1.0f);*/
 
 		int i[9];
 		i[0] = 0;
@@ -163,7 +165,7 @@ void SoftRenderer::Update()
 		i[8] = 8;
 
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < 3; i++)
 		{
 			v[i].Position *= resultMat;
 		}
@@ -171,7 +173,7 @@ void SoftRenderer::Update()
 		// Draw Call
 		RSI->SetVertexBuffer(v);
 		RSI->SetIndexBuffer(i);
-		RSI->DrawPrimitive(9, 9);
+		RSI->DrawPrimitive(3, 3);
 
 
 		RSI->EndFrame();
