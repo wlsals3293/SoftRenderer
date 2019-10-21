@@ -93,7 +93,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 			}
 		}*/
 
-		VertexData tv[3] = {
+		/*VertexData tv[3] = {
 			VertexBuffer[IndexBuffer[ti * 3]],
 			VertexBuffer[IndexBuffer[ti * 3 + 1]],
 			VertexBuffer[IndexBuffer[ti * 3 + 2]]
@@ -212,7 +212,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 				DrawTopFlatTriangle(bottomTriangle);
 				DrawBottomFlatTriangle(upperTriangle);
 			}
-		}
+		}*/
 
 		// 3. Top-Flat, Bottom-Flat은 해당 로직으로,
 		// Normal은 두 개로 분리해서 상하를 나눠서 그리기
@@ -220,21 +220,28 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 		
 
 
-
-		/*
-		TriangleRasterizer tr(VertexBuffer[i * 3],
-			VertexBuffer[i * 3 + 1],
-			VertexBuffer[i * 3 + 2]);
-
-		for (int x = tr.TopLeft.X; x < tr.BottomRight.X; x++)
+		// Draw Each Triangle List
+		/*TriangleRasterizer t(
+			VertexBuffer[IndexBuffer[ti * 3]],
+			VertexBuffer[IndexBuffer[ti * 3 + 1]],
+			VertexBuffer[IndexBuffer[ti * 3 + 2]]);
+		t.RecalcBounds();
+		for (int x = t.TopLeft.X; x < t.BottomRight.X; ++x)
 		{
-			for (int y = tr.BottomRight.Y; y < tr.TopLeft.Y; y++)
+			for (int y = t.TopLeft.Y; y < t.BottomRight.Y; ++y)
 			{
 				ScreenPoint currentPixel(x, y);
 				Vector2 currentPos = currentPixel.ToVector2();
-				if (tr.IsInside(currentPos))
+				if (t.IsInside(currentPos))
 				{
-					SetPixel(currentPixel, LinearColor(1.f, 0.f, 0.f));
+					if (HasTexture)
+					{
+						SetPixel(currentPixel, GetTextureSample(t.GetUV(currentPos)));
+					}
+					else
+					{
+						SetPixel(currentPixel, t.GetColor(currentPos));
+					}
 				}
 			}
 		}*/
@@ -413,8 +420,14 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 	float finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
 	float finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
 
+	Vector2 currentUV;
+	currentUV.X = tvs[0].UV.X * (1 - s - t) + tvs[1].UV.X * s + tvs[2].UV.X * t;
+	currentUV.Y = tvs[0].UV.Y * (1 - s - t) + tvs[1].UV.Y * s + tvs[2].UV.Y * t;
 
-	SetPixel(ScreenPoint(tvs[2].Position), LinearColor(1.f, 0.f, 0.f));
+	LinearColor textureColor = GetTextureSample(currentUV);
+	
+
+	SetPixel(ScreenPoint(tvs[2].Position), textureColor);
 	float startX = tvs[2].Position.X;
 	float startY = tvs[2].Position.Y;
 	float currentY = floorf(tvs[2].Position.Y) - 0.5f;
@@ -439,11 +452,11 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 			s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
 			t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
 
-			finalR = tvs[0].Color.R * (1 - s - t) + tvs[1].Color.R * s + tvs[2].Color.R * t;
-			finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
-			finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
+			currentUV.X = tvs[0].UV.X * (1 - s - t) + tvs[1].UV.X * s + tvs[2].UV.X * t;
+			currentUV.Y = tvs[0].UV.Y * (1 - s - t) + tvs[1].UV.Y * s + tvs[2].UV.Y * t;
+			textureColor = GetTextureSample(currentUV);
 
-			SetPixel(ScreenPoint(p, pixelY), LinearColor(1.f, 0.f, 0.f));
+			SetPixel(ScreenPoint(p, pixelY), textureColor);
 		}
 		currentY += 1.0f;
 	}
@@ -496,11 +509,32 @@ void WindowsRSI::DrawBottomFlatTriangle(VertexData * tvs)
 	}
 
 	// 마지막 라인을 그린다.
-	int pixelX1 = Math::FloorToInt(tvs[0].Position.X);
+	/*int pixelX1 = Math::FloorToInt(tvs[0].Position.X);
 	int pixelX2 = Math::FloorToInt(tvs[1].Position.X);
 	int pixelY = Math::FloorToInt(destY);
 	for (int p = pixelX1; p <= pixelX2; ++p)
 	{
 		SetPixel(ScreenPoint(p, pixelY), LinearColor(0.f, 1.f, 0.f));
-	}
+	}*/
+}
+
+int WindowsRSI::SetTexture(RSITexture & InRSITexture)
+{
+	MainTexture.TextureBuffer = InRSITexture.TextureBuffer;
+	MainTexture.Width = InRSITexture.Width;
+	MainTexture.Height = InRSITexture.Height;
+	HasTexture = true;
+	return 0;
+}
+
+LinearColor WindowsRSI::GetTextureSample(const Vector2 & InUV)
+{
+	UINT width = MainTexture.Width;
+	UINT height = MainTexture.Height;
+	UINT pixelX = Math::FloorToInt(InUV.X * width);
+	UINT pixelY = Math::FloorToInt(InUV.Y * height);
+	pixelX %= width;
+	pixelY %= height;
+	UINT textureIndex = width * pixelY + pixelX;
+	return MainTexture.TextureBuffer[textureIndex];
 }

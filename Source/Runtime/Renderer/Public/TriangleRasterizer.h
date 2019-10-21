@@ -10,7 +10,7 @@ public:
 	TriangleRasterizer(VertexData InV1, VertexData InV2, VertexData InV3);
 
 public:
-	void RecalBounds();
+	void RecalcBounds();
 
 	FORCEINLINE bool IsInside(const Vector2& InVec) const
 	{
@@ -30,6 +30,13 @@ public:
 		float s = (DotVV * dotUW - DotUV * dotVW) * InvDenom;
 		float t = (DotUU * dotVW - DotUV * dotUW) * InvDenom;
 		return Vector2(s, t);
+	}
+
+	FORCEINLINE Vector2 GetUV(const Vector2& InScreenPosition) const
+	{
+		Vector2 st = GetBaryCentricCoord(InScreenPosition);
+		float oneMinusST = 1 - st.X - st.Y;
+		return VertexBuffer[0].UV * oneMinusST + VertexBuffer[1].UV * st.X + VertexBuffer[2].UV * st.Y;
 	}
 
 

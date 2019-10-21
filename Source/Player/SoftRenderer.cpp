@@ -12,10 +12,13 @@ void SoftRenderer::Initialize(HWND InWnd)
 	FrameCount = 0;
 
 	RSI = new WindowsRSI();
-	if (RSI != nullptr)
+	if (RSI == nullptr)
 	{
-		RSI->Init(false);
+		return;
 	}
+
+	RSI->Init(false);
+	MainTexture.LoadPNGFile("Steve.png");
 }
 
 void SoftRenderer::Shutdown()
@@ -87,50 +90,69 @@ void SoftRenderer::Update()
 		*/
 
 
-		Matrix3x3 resultMat, translationMat, rotateMat, scaleMat;
+		
 
-		translationMat.SetTranslation(250.f, -180.f);
-		/*
+		float speed = 200.f;
+		float currentScale = 100.f;
+		static GameObject2D quad;
+		static Camera2D camera;
+
+		Vector2 deltaMove = Vector2(
+			speed * InputManager.GetXAxis(),
+			speed * InputManager.GetYAxis()
+		) * FrameSec;
+
+		camera.Transform.AddPosition(deltaMove);
+		//quad.GetTransform().SetPosition(Vector2(150.f, 10.f));
+		
 		static float angleSpeedPerSec = 180.f;
 		float currentAngle = ElapsedTime * angleSpeedPerSec;
-		rotateMat.SetRotation(Math::Deg2Rad(currentAngle));
+		quad.GetTransform().AddRotation(angleSpeedPerSec * FrameSec);
 
-		static Vector2 minScale(0.8f, 0.8f);
+		/*static Vector2 minScale(0.8f, 0.8f);
 		static Vector2 maxScale(1.0f, 1.0f);
 		float sin, cos;
-		Math::GetSinCos(sin, cos, currentAngle * 2);
+		Math::GetSinCos(sin, cos, currentAngle);
 
-		Vector2 calVector = (maxScale - minScale) * ((sin+1.f) / 2.f);
-
-		scaleMat.SetScale(minScale + calVector);*/
+		Vector2 calVector = (maxScale - minScale) * ((sin+1.f) * 0.5f);
+		quad.GetTransform().SetScale(minScale + calVector);*/
+		quad.GetTransform().SetScale(Vector2::One * currentScale);
 		
-		resultMat = translationMat;
+		Matrix3x3 fMat = camera.GetViewMatrix() * quad.GetTransform().GetTRS();
 
 
 		// Define Mesh Data
-		VertexData v[9];
-		v[0].Position = Vector3(-60.0f, -40.0f, 1.f);
+		const int vertexCount = 4;
+		VertexData v[vertexCount];
+		v[0].Position = Vector3(-0.5f, -0.5f, 1.f);
 		v[0].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[1].Position = Vector3(30.0f, 0.0f, 1.f);
+		v[0].UV = Vector2(0.f, 0.f);
+
+		v[1].Position = Vector3(-0.5f, 0.5f, 1.f);
 		v[1].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[2].Position = Vector3(0.0f, 100.0f, 1.f);
+		v[1].UV = Vector2(0.f, 1.f);
+
+		v[2].Position = Vector3(0.5f, 0.5f, 1.f);
 		v[2].Color = LinearColor(0.0f, 0.0f, 1.0f);
+		v[2].UV = Vector2(1.f, 1.f);
 
-		int i[3];
-		i[0] = 0;
-		i[1] = 1;
-		i[2] = 2;
+		v[3].Position = Vector3(0.5f, -0.5f, 1.f);
+		v[3].Color = LinearColor(0.0f, 0.0f, 1.0f);
+		v[3].UV = Vector2(1.f, 0.f);
 
+		const int indexCount = 6;
+		int i[indexCount] = { 0, 1, 2, 0, 2, 3 };
 
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < vertexCount; i++)
 		{
-			v[i].Position *= resultMat;
+			v[i].Position *= fMat;
 		}
 
 		// Draw Call
+		RSI->SetTexture(RSITexture(MainTexture.GetBuffer(), MainTexture.GetWidth(), MainTexture.GetHeight()));
 		RSI->SetVertexBuffer(v);
 		RSI->SetIndexBuffer(i);
-		RSI->DrawPrimitive(3, 3);
+		RSI->DrawPrimitive(vertexCount, indexCount);
 
 
 		RSI->EndFrame();

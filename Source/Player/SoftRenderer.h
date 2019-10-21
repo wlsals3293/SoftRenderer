@@ -1,6 +1,7 @@
 #pragma once
 
 #include "WindowsRSI.h"
+#include "InputManager.h"
 
 class SoftRenderer
 {
@@ -33,6 +34,8 @@ public:
 	float GetElapsedTime() const { return ElapsedTime; }
 	int GetFrameCount() const { return FrameCount; }
 
+	InputManager& GetInputManager() { return InputManager; }
+
 
 private:
 	SoftRenderer() { }
@@ -50,4 +53,7 @@ private:
 	LONGLONG StartFrameTime = 0;
 	LONGLONG FrameTime = 0;
 	int FrameCount = 0;
+
+	InputManager InputManager;
+	Texture MainTexture;
 };

@@ -7,6 +7,15 @@
 #include "VertexData.h"
 
 
+struct RSITexture
+{
+	RSITexture() = default;
+	RSITexture(LinearColor* InTextureBuffer, UINT InWidth, UINT InHeight) : TextureBuffer(InTextureBuffer), Width(InWidth), Height(InHeight) {}
+	UINT Width = 0;
+	UINT Height = 0;
+	LinearColor* TextureBuffer = nullptr;
+};
+
 class RenderingSoftwareInterface
 {
 public:
@@ -30,4 +39,6 @@ public:
 	virtual void DrawTriangle(const Vector2& P1, const Vector2& P2, const Vector2& P3) = 0;
 	virtual void DrawTopFlatTriangle(VertexData* tvs, bool DrawLastLine) = 0;
 	virtual void DrawBottomFlatTriangle(VertexData* tvs) = 0;
+
+	virtual int SetTexture(RSITexture& InRSITexture) = 0;
 };

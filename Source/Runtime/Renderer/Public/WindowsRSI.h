@@ -34,7 +34,12 @@ public:
 	virtual void DrawTopFlatTriangle(VertexData* tvs, bool DrawLastLine = false) override;
 	virtual void DrawBottomFlatTriangle(VertexData* tvs) override;
 
+	virtual int SetTexture(RSITexture& InRSITexture) override;
+	LinearColor GetTextureSample(const Vector2& InUV);
+
 private:
 	VertexData* VertexBuffer;
 	const int* IndexBuffer;
+	RSITexture MainTexture;
+	bool HasTexture;
 };

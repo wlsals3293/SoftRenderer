@@ -7,10 +7,10 @@ TriangleRasterizer::TriangleRasterizer(VertexData InV1, VertexData InV2, VertexD
 	VertexBuffer[1] = InV2;
 	VertexBuffer[2] = InV3;
 
-	RecalBounds();
+	RecalcBounds();
 }
 
-void TriangleRasterizer::RecalBounds()
+void TriangleRasterizer::RecalcBounds()
 {
 	Vector2 sbbMin2D = Vector2(INFINITY, INFINITY);
 	Vector2 sbbMax2D = Vector2(-INFINITY, -INFINITY);
@@ -38,10 +38,10 @@ void TriangleRasterizer::RecalBounds()
 	tempVec.Y = Math::Min(tempVec.Y, VertexBuffer[2].Position.Y);
 	BottomRight = ScreenPoint(Math::TruncToInt(tempVec.X), Math::TruncToInt(tempVec.Y));
 	*/
-	/*UVector = VertexBuffer[1].Position - VertexBuffer[0].Position;
+	UVector = VertexBuffer[1].Position - VertexBuffer[0].Position;
 	VVector = VertexBuffer[2].Position - VertexBuffer[0].Position;
 	DotUU = UVector.Dot(UVector);
 	DotUV = UVector.Dot(VVector);
 	DotVV = VVector.Dot(VVector);
-	InvDenom = 1.0f / (DotUU * DotVV - DotUV * DotUV);*/
+	InvDenom = 1.0f / (DotUU * DotVV - DotUV * DotUV);
 }
