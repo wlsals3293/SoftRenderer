@@ -45,37 +45,13 @@ void SoftRenderer::Update()
 	{
 		RSI->Clear(LinearColor(0.125f, 0.5f, 1.f, 1.f));
 
-		/*RSI->SetColor(LinearColor(1.f, 0.f, 0.f, 1.f));
-
-		VertexData vertices[6];
-		vertices[0].Position = Vector2(260.f, 100.f);
-		vertices[1].Position = Vector2(200.f, 200.f);
-		vertices[2].Position = Vector2(130.f, 70.f);
-		
-		vertices[3].Position = Vector2(-230.f, -200.f);
-		vertices[4].Position = Vector2(-50.f, -250.f);
-		vertices[5].Position = Vector2(-100.f, -50.f);
-
-		int indices[6];
-		indices[0] = 0;
-		indices[1] = 1;
-		indices[2] = 2;
-		indices[3] = 3;
-		indices[4] = 4;
-		indices[5] = 5;
-
-		// Draw Call
-		RSI->SetVertexBuffer(vertices);
-		RSI->SetIndexBuffer(indices);
-		RSI->DrawPrimitive(6, 6);*/
-
 		// Draw Grid
 		ScreenPoint screenSize = DisplaySetting::Inst().GetSize();
 		ScreenPoint halfSize = screenSize.GetHalfSize();
 		LinearColor gridColor(0.6f, 0.6f, 0.6f, 1.f);
 		int padding = 10;
-		int verticalCount = Math::TruncToInt(halfSize.X / padding);
-		int horizontalCount = Math::TruncToInt(halfSize.Y / padding);
+		int verticalCount = Math::TruncToInt(halfSize.X / (float)padding);
+		int horizontalCount = Math::TruncToInt(halfSize.Y / (float)padding);
 
 		for (int i = 1; i < verticalCount; i++)
 		{
@@ -113,9 +89,9 @@ void SoftRenderer::Update()
 
 		Matrix3x3 resultMat, translationMat, rotateMat, scaleMat;
 
-		translationMat.SetTranslation(Vector3(100.f, 0.f));
-
-		/*static float angleSpeedPerSec = 180.f;
+		translationMat.SetTranslation(250.f, -180.f);
+		/*
+		static float angleSpeedPerSec = 180.f;
 		float currentAngle = ElapsedTime * angleSpeedPerSec;
 		rotateMat.SetRotation(Math::Deg2Rad(currentAngle));
 
@@ -127,42 +103,23 @@ void SoftRenderer::Update()
 		Vector2 calVector = (maxScale - minScale) * ((sin+1.f) / 2.f);
 
 		scaleMat.SetScale(minScale + calVector);*/
-
+		
 		resultMat = translationMat;
+
 
 		// Define Mesh Data
 		VertexData v[9];
-		v[0].Position = Vector2(-60.0f, 0.0f);
+		v[0].Position = Vector3(-60.0f, -40.0f, 1.f);
 		v[0].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[1].Position = Vector2(20.0f, 0.0f);
+		v[1].Position = Vector3(30.0f, 0.0f, 1.f);
 		v[1].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[2].Position = Vector2(0.0f, 90.0f);
+		v[2].Position = Vector3(0.0f, 100.0f, 1.f);
 		v[2].Color = LinearColor(0.0f, 0.0f, 1.0f);
 
-		/*v[3].Position = Vector2(150.0f, 100.0f);
-		v[3].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[4].Position = Vector2(100.0f, -100.0f);
-		v[4].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[5].Position = Vector2(200.0f, -100.0f);
-		v[5].Color = LinearColor(0.0f, 0.0f, 1.0f);
-
-		v[6].Position = Vector2(50.0f, 100.0f);
-		v[6].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[7].Position = Vector2(-50.0f, 0.0f);
-		v[7].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[8].Position = Vector2(0.0f, -100.0f);
-		v[8].Color = LinearColor(0.0f, 0.0f, 1.0f);*/
-
-		int i[9];
+		int i[3];
 		i[0] = 0;
 		i[1] = 1;
 		i[2] = 2;
-		i[3] = 3;
-		i[4] = 4;
-		i[5] = 5;
-		i[6] = 6;
-		i[7] = 7;
-		i[8] = 8;
 
 
 		for (int i = 0; i < 3; i++)

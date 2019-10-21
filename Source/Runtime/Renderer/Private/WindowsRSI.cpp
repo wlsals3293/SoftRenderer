@@ -395,6 +395,25 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 	float a2 = dx2 / dy;
 
 
+	// Barycentric Coord
+	Vector3 u = tvs[1].Position - tvs[0].Position;
+	Vector3 v = tvs[2].Position - tvs[0].Position;
+	float dotUU = u.Dot(u);
+	float dotUV = u.Dot(v);
+	float dotVV = v.Dot(v);
+	float invDenom = 1.0f / (dotUU * dotVV - dotUV * dotUV);
+
+	Vector3 w = tvs[2].Position - tvs[0].Position;
+	float dotUW = u.Dot(w);
+	float dotVW = v.Dot(w);
+	float s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
+	float t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
+
+	float finalR = tvs[0].Color.R * (1 - s - t) + tvs[1].Color.R * s + tvs[2].Color.R * t;
+	float finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
+	float finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
+
+
 	SetPixel(ScreenPoint(tvs[2].Position), LinearColor(1.f, 0.f, 0.f));
 	float startX = tvs[2].Position.X;
 	float startY = tvs[2].Position.Y;
@@ -411,6 +430,19 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 		int pixelY = Math::FloorToInt(currentY);
 		for (int p = pixelX1; p <= pixelX2; ++p)
 		{
+			Vector3 currentPosition = ScreenPoint(p, pixelY).ToVector3();
+
+			// barycentric coord
+			w = currentPosition - tvs[0].Position;
+			dotUW = u.Dot(w);
+			dotVW = v.Dot(w);
+			s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
+			t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
+
+			finalR = tvs[0].Color.R * (1 - s - t) + tvs[1].Color.R * s + tvs[2].Color.R * t;
+			finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
+			finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
+
 			SetPixel(ScreenPoint(p, pixelY), LinearColor(1.f, 0.f, 0.f));
 		}
 		currentY += 1.0f;

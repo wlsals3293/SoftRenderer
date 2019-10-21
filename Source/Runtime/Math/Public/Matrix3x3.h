@@ -11,7 +11,7 @@ public:
 	Matrix3x3(float In00, float In01, float In02, float In10, float In11, float In12, float In20, float In21, float In22);
 
 	FORCEINLINE void SetIdentity();
-	FORCEINLINE void SetTranslation(Vector3 InV);
+	FORCEINLINE void SetTranslation(float InX, float InY);
 	FORCEINLINE void SetRotation(float InRadian);
 	FORCEINLINE void SetScale(Vector3 InScale);
 	FORCEINLINE Matrix3x3 Tranpose() const;
@@ -41,10 +41,14 @@ FORCEINLINE void Matrix3x3::SetIdentity()
 	*this = Matrix3x3::Identity;
 }
 
-FORCEINLINE void Matrix3x3::SetTranslation(Vector3 InV)
+FORCEINLINE void Matrix3x3::SetTranslation(float InX, float InY)
 {
-	SetIdentity();
-	Cols[2] = InV;
+	Cols[0] = Vector3::UnitX;
+	Cols[1] = Vector3::UnitY;
+	Cols[2] = Vector3::UnitZ;
+
+	Cols[2].X = InX;
+	Cols[2].Y = InY;
 }
 
 FORCEINLINE void Matrix3x3::SetRotation(float InRadian)

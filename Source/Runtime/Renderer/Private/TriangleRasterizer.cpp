@@ -23,8 +23,8 @@ void TriangleRasterizer::RecalBounds()
 		if (VertexBuffer[i].Position.Y > sbbMax2D.Y) sbbMax2D.Y = VertexBuffer[i].Position.Y;
 	}
 
-	BottomRight = ScreenPoint(sbbMax2D.X, sbbMin2D.Y);
-	TopLeft = ScreenPoint(sbbMin2D.X, sbbMax2D.Y);
+	//BottomRight = ScreenPoint(sbbMax2D.X, sbbMin2D.Y);
+	//TopLeft = ScreenPoint(sbbMin2D.X, sbbMax2D.Y);
 	/*
 	tempVec.X = Math::Min(VertexBuffer[0].Position.X, VertexBuffer[1].Position.X);
 	tempVec.X = Math::Min(tempVec.X, VertexBuffer[2].Position.X);
@@ -38,10 +38,10 @@ void TriangleRasterizer::RecalBounds()
 	tempVec.Y = Math::Min(tempVec.Y, VertexBuffer[2].Position.Y);
 	BottomRight = ScreenPoint(Math::TruncToInt(tempVec.X), Math::TruncToInt(tempVec.Y));
 	*/
-	UVector = VertexBuffer[1].Position - VertexBuffer[0].Position;
+	/*UVector = VertexBuffer[1].Position - VertexBuffer[0].Position;
 	VVector = VertexBuffer[2].Position - VertexBuffer[0].Position;
 	DotUU = UVector.Dot(UVector);
 	DotUV = UVector.Dot(VVector);
 	DotVV = VVector.Dot(VVector);
-	InvDenom = 1.0f / (DotUU * DotVV - DotUV * DotUV);
+	InvDenom = 1.0f / (DotUU * DotVV - DotUV * DotUV);*/
 }
