@@ -1,14 +1,12 @@
 #pragma once
 
 #include "CoreDefinition.h"
-#include "Vector3.h"
 
 struct Vector2
 {
 public:
 	Vector2() { }
 	constexpr FORCEINLINE Vector2(float InX, float InY) : X(InX), Y(InY) { }
-	constexpr FORCEINLINE Vector2(Vector3 InV) : X(InV.X), Y(InV.Y) { }
 
 	FORCEINLINE float SizeSquared() const;
 	FORCEINLINE float Dot(const Vector2& InV) const;

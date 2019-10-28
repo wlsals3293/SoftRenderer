@@ -93,7 +93,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 			}
 		}*/
 
-		/*VertexData tv[3] = {
+		VertexData tv[3] = {
 			VertexBuffer[IndexBuffer[ti * 3]],
 			VertexBuffer[IndexBuffer[ti * 3 + 1]],
 			VertexBuffer[IndexBuffer[ti * 3 + 2]]
@@ -212,7 +212,7 @@ void WindowsRSI::DrawPrimitive(UINT InVertexSize, UINT InIndexSize)
 				DrawTopFlatTriangle(bottomTriangle);
 				DrawBottomFlatTriangle(upperTriangle);
 			}
-		}*/
+		}
 
 		// 3. Top-Flat, Bottom-Flat은 해당 로직으로,
 		// Normal은 두 개로 분리해서 상하를 나눠서 그리기
@@ -420,9 +420,7 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 	float finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
 	float finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
 
-	Vector2 currentUV;
-	currentUV.X = tvs[0].UV.X * (1 - s - t) + tvs[1].UV.X * s + tvs[2].UV.X * t;
-	currentUV.Y = tvs[0].UV.Y * (1 - s - t) + tvs[1].UV.Y * s + tvs[2].UV.Y * t;
+	Vector2 currentUV = tvs[0].UV * (1 - s - t) + tvs[1].UV * s + tvs[2].UV * t;
 
 	LinearColor textureColor = GetTextureSample(currentUV);
 	
@@ -452,8 +450,7 @@ void WindowsRSI::DrawTopFlatTriangle(VertexData * tvs, bool DrawLastLine)
 			s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
 			t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
 
-			currentUV.X = tvs[0].UV.X * (1 - s - t) + tvs[1].UV.X * s + tvs[2].UV.X * t;
-			currentUV.Y = tvs[0].UV.Y * (1 - s - t) + tvs[1].UV.Y * s + tvs[2].UV.Y * t;
+			currentUV = tvs[0].UV * (1 - s - t) + tvs[1].UV * s + tvs[2].UV * t;
 			textureColor = GetTextureSample(currentUV);
 
 			SetPixel(ScreenPoint(p, pixelY), textureColor);
@@ -488,7 +485,30 @@ void WindowsRSI::DrawBottomFlatTriangle(VertexData * tvs)
 	float gradient1 = dx1 / dy;
 	float gradient2 = dx2 / dy;
 
-	SetPixel(ScreenPoint(tvs[0].Position), LinearColor(0.f, 1.f, 0.f));
+	// Barycentric Coord
+	Vector3 u = tvs[1].Position - tvs[0].Position;
+	Vector3 v = tvs[2].Position - tvs[0].Position;
+	float dotUU = u.Dot(u);
+	float dotUV = u.Dot(v);
+	float dotVV = v.Dot(v);
+	float invDenom = 1.0f / (dotUU * dotVV - dotUV * dotUV);
+
+	Vector3 w = tvs[2].Position - tvs[0].Position;
+	float dotUW = u.Dot(w);
+	float dotVW = v.Dot(w);
+	float s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
+	float t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
+
+	float finalR = tvs[0].Color.R * (1 - s - t) + tvs[1].Color.R * s + tvs[2].Color.R * t;
+	float finalG = tvs[0].Color.G * (1 - s - t) + tvs[1].Color.G * s + tvs[2].Color.G * t;
+	float finalB = tvs[0].Color.B * (1 - s - t) + tvs[1].Color.B * s + tvs[2].Color.B * t;
+
+	Vector2 currentUV = tvs[0].UV * (1 - s - t) + tvs[1].UV * s + tvs[2].UV * t;
+
+	LinearColor textureColor = GetTextureSample(currentUV);
+
+
+	SetPixel(ScreenPoint(tvs[0].Position), textureColor);
 	float startY = tvs[0].Position.Y;
 	float startX = tvs[0].Position.X;
 	float currentY = floorf(tvs[0].Position.Y) - 0.5f;
@@ -503,7 +523,19 @@ void WindowsRSI::DrawBottomFlatTriangle(VertexData * tvs)
 		int pixelY = Math::FloorToInt(currentY);
 		for (int p = startX; p <= endX; ++p)
 		{
-			SetPixel(ScreenPoint(p, pixelY), LinearColor(0.f, 1.f, 0.f));
+			Vector3 currentPosition = ScreenPoint(p, pixelY).ToVector3();
+
+			// barycentric coord
+			w = currentPosition - tvs[0].Position;
+			dotUW = u.Dot(w);
+			dotVW = v.Dot(w);
+			s = (dotVV * dotUW - dotUV * dotVW) * invDenom;
+			t = (dotUU * dotVW - dotUV * dotUW) * invDenom;
+
+			currentUV = tvs[0].UV * (1 - s - t) + tvs[1].UV * s + tvs[2].UV * t;
+			textureColor = GetTextureSample(currentUV);
+
+			SetPixel(ScreenPoint(p, pixelY), textureColor);
 		}
 		currentY -= 1.0f;
 	}

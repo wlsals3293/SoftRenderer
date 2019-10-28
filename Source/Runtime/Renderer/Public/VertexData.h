@@ -7,6 +7,8 @@
 
 struct VertexData
 {
+	VertexData(Vector3 InV) : Position(InV) {}
+
 	Vector3 Position;
 	LinearColor Color;
 	Vector2 UV;

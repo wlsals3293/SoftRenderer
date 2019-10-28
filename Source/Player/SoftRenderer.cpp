@@ -89,11 +89,7 @@ void SoftRenderer::Update()
 		RSI->DrawLine(Vector2(30.f, -30.f), Vector2(200.f, -100.f), LinearColor::White);
 		*/
 
-
-		
-
-		float speed = 200.f;
-		float currentScale = 100.f;
+		/*
 		static GameObject2D quad;
 		static Camera2D camera;
 
@@ -104,49 +100,118 @@ void SoftRenderer::Update()
 
 		camera.Transform.AddPosition(deltaMove);
 		//quad.GetTransform().SetPosition(Vector2(150.f, 10.f));
-		
+
 		static float angleSpeedPerSec = 180.f;
 		float currentAngle = ElapsedTime * angleSpeedPerSec;
-		quad.GetTransform().AddRotation(angleSpeedPerSec * FrameSec);
+		quad.GetTransform().AddRotation(angleSpeedPerSec * FrameSec);*/
 
-		/*static Vector2 minScale(0.8f, 0.8f);
-		static Vector2 maxScale(1.0f, 1.0f);
-		float sin, cos;
-		Math::GetSinCos(sin, cos, currentAngle);
 
-		Vector2 calVector = (maxScale - minScale) * ((sin+1.f) * 0.5f);
-		quad.GetTransform().SetScale(minScale + calVector);*/
-		quad.GetTransform().SetScale(Vector2::One * currentScale);
-		
-		Matrix3x3 fMat = camera.GetViewMatrix() * quad.GetTransform().GetTRS();
+		static Vector3 cubePos = Vector3::Zero;
+		static Vector3 cubeRotation = Vector3::Zero;
 
+		float moveSpeed = 200.f;
+		float rotateSpeed = 180.f;
+		float currentScale = 100.f;
+
+		float cr, sr, cp, sp, cy, sy;
+
+		Math::GetSinCos(sr, cr, cubeRotation.Z);
+		Math::GetSinCos(sp, cp, cubeRotation.X);
+		Math::GetSinCos(sy, cy, cubeRotation.Y);
+
+
+		Matrix4x4 rMat = Matrix4x4(
+			Vector4(cr*cy + sr * sp*sy, sr*cy - cr * sp*sy, cp*-sy, 0.f),
+			Vector4(-sr * cp, cr*cp, -sp, 0.f),
+			Vector4(cr*sy - sr * sp*cy, sr*sy + cr * sp*cy, 0),
+			Vector4(0.f, 0.f, 0.f, 1.f)
+		);
+
+		//Matrix4x4 sMat = ;
+
+		Matrix4x4 fMat = rMat;
+
+		float FOV = 90.f;
+
+		float a = (float)screenSize.X / (float)screenSize.Y;
+		float repA = (float)screenSize.Y / (float)screenSize.X;
+		float d = 1.f / tanf(FOV * 0.5f);
 
 		// Define Mesh Data
-		const int vertexCount = 4;
-		VertexData v[vertexCount];
-		v[0].Position = Vector3(-0.5f, -0.5f, 1.f);
-		v[0].Color = LinearColor(1.0f, 0.0f, 0.0f);
-		v[0].UV = Vector2(0.f, 0.f);
+		const int vertexCount = 24;
+		VertexData v[vertexCount] = {
+			// Front
+			VertexData(Vector3(0.5f, -0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, 0.5f, -0.5f)),
+			VertexData(Vector3(0.5f, -0.5f, -0.5f)),
+			// Left
+			VertexData(Vector3(-0.5f, -0.5f, 0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, -0.5f, 0.5f)),
+			// Right
+			VertexData(Vector3(0.5f, -0.5f, -0.5f)),
+			VertexData(Vector3(0.5f, 0.5f, -0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, -0.5f)),
+			VertexData(Vector3(-0.5f, -0.5f, -0.5f)),
+			// Back
+			VertexData(Vector3(-0.5f, -0.5f, -0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, -0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(-0.5f, -0.5f, 0.5f)),
+			// Top
+			VertexData(Vector3(0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, 0.5f)),
+			VertexData(Vector3(-0.5f, 0.5f, -0.5f)),
+			VertexData(Vector3(0.5f, 0.5f, -0.5f)),
+			// Bottom
+			VertexData(Vector3(-0.5f, -0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, -0.5f, 0.5f)),
+			VertexData(Vector3(0.5f, -0.5f, -0.5f)),
+			VertexData(Vector3(-0.5f, -0.5f, -0.5f))
+		};
 
-		v[1].Position = Vector3(-0.5f, 0.5f, 1.f);
-		v[1].Color = LinearColor(0.0f, 1.0f, 0.0f);
-		v[1].UV = Vector2(0.f, 1.f);
+		const int triangleCount = 12;
+		const int indexCount = triangleCount * 3;
+		int i[indexCount] = {
+		 0, 2, 1, 0, 3, 2,
+		 4, 6, 5, 4, 7, 6,
+		 8, 10, 9, 8, 11, 10,
+		 12, 14, 13, 12, 15, 14,
+		 16, 18, 17, 16, 19, 18,
+		 20, 22, 21, 20, 23, 22
+		};
 
-		v[2].Position = Vector3(0.5f, 0.5f, 1.f);
-		v[2].Color = LinearColor(0.0f, 0.0f, 1.0f);
-		v[2].UV = Vector2(1.f, 1.f);
+		//for (int i = 0; i < vertexCount; i++)
+		//{
+			//v[i].Position *= fMat;
+		//}
 
-		v[3].Position = Vector3(0.5f, -0.5f, 1.f);
-		v[3].Color = LinearColor(0.0f, 0.0f, 1.0f);
-		v[3].UV = Vector2(1.f, 0.f);
-
-		const int indexCount = 6;
-		int i[indexCount] = { 0, 1, 2, 0, 2, 3 };
-
-		for (int i = 0; i < vertexCount; i++)
+		for (int t = 0; t < triangleCount; t++)
 		{
-			v[i].Position *= fMat;
+			Vector4 tp[3];
+			tp[0] = v[i[t * 3]].Position;
+			tp[1] = v[i[t * 3 + 1]].Position;
+			tp[2] = v[i[t * 3 + 2]].Position;
+
+			for (int ti = 0; ti < 3; ti++)
+			{
+				tp[ti] = fMat * tp[ti];
+
+				float repZ = 1.f / -tp[ti].Z;
+				tp[ti].Y = tp[ti].Y * d * repZ;
+				tp[ti].X = tp[ti].X * d * repZ * repA;
+
+				tp[ti].X *= (screenSize.X * 0.5f);
+				tp[ti].Y *= (screenSize.Y * 0.5f);
+			}
+			RSI->DrawLine(tp[0], tp[1], LinearColor::Red);
 		}
+		
+
+
+
 
 		// Draw Call
 		RSI->SetTexture(RSITexture(MainTexture.GetBuffer(), MainTexture.GetWidth(), MainTexture.GetHeight()));

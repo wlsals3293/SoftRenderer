@@ -1,6 +1,7 @@
 
 #include "Precompiled.h"
 #include "Matrix2x2.h"
+#include "Vector2.h"
 
 const Matrix2x2 Matrix2x2::Identity(Vector2::UnitX, Vector2::UnitY);
 

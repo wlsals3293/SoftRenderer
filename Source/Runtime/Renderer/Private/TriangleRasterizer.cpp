@@ -38,8 +38,11 @@ void TriangleRasterizer::RecalcBounds()
 	tempVec.Y = Math::Min(tempVec.Y, VertexBuffer[2].Position.Y);
 	BottomRight = ScreenPoint(Math::TruncToInt(tempVec.X), Math::TruncToInt(tempVec.Y));
 	*/
-	UVector = VertexBuffer[1].Position - VertexBuffer[0].Position;
-	VVector = VertexBuffer[2].Position - VertexBuffer[0].Position;
+	Vector3 TempVec;
+	TempVec = VertexBuffer[1].Position - VertexBuffer[0].Position;
+	UVector = Vector2(TempVec.X, TempVec.Y);
+	TempVec = VertexBuffer[2].Position - VertexBuffer[0].Position;
+	VVector = Vector2(TempVec.X, TempVec.Y);
 	DotUU = UVector.Dot(UVector);
 	DotUV = UVector.Dot(VVector);
 	DotVV = VVector.Dot(VVector);
